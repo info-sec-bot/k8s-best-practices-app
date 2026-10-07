@@ -31,6 +31,8 @@ jobs:
       with:
         context: .
         push: true
+         # Force Docker Buildx to compile and package for both CPU architectures
+        platforms: linux/amd64,linux/arm64
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/journal-app:${{ steps.vars.outputs.sha_short }}
           ${{ secrets.DOCKERHUB_USERNAME }}/journal-app:latest
