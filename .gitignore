@@ -1,0 +1,18 @@
+# Compiled binaries
+k8s-best-practices-app
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary executed by 'go test'
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Environment variables / secrets
+.env
+
