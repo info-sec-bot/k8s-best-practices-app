@@ -4,17 +4,20 @@ WORKDIR /html
 RUN mkdir public && echo '<h1>Journal Frontend Mock</h1><p>Kubernetes Best Practices</p>' > public/index.html
 
 # ── STAGE 2: Build the Go binary securely ──
-# CHANGE THIS LINE to use the 1.26 alpine image:
 FROM golang:1.26-alpine AS backend-builder
 WORKDIR /app
+
+# TARGETOS and TARGETARCH are automatically injected by Docker Buildx
+ARG TARGETOS
+ARG TARGETARCH
 
 # Copy dependency manifests first to leverage Docker layer caching
 COPY go.mod ./
 RUN go mod download
 
-# Copy source and build static binary (disabled CGO, stripped symbols)
+# Copy source and cross-compile dynamically based on target platform variables
 COPY main.go ./
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o server .
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-w -s" -o server .
 
 # ── STAGE 3: Final secure, minimal runtime image ──
 FROM alpine:3.18
@@ -32,4 +35,3 @@ USER appuser
 EXPOSE 8080
 
 ENTRYPOINT ["/app/server"]
-
